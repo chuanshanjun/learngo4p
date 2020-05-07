@@ -12,17 +12,17 @@ type Concurrent struct {
 type Scheduler interface {
 	Submit(Request)
 	ConfigureMaterWorkerChan(chan Request)
+	Run()
+	WorkerReady(chan Request)
 }
 
 func (c *Concurrent) Run(seeds ...Request) {
-	// 1 创建channel of in&out
-	in := make(chan Request)
+	// 1 创建channel of out
 	out := make(chan ParseResult)
-	// 2 准备好workerChan
-	c.Scheduler.ConfigureMaterWorkerChan(in)
-	// 3 createWorker
+	c.Scheduler.Run()
+	// 2 createWorker
 	for i := 0; i < c.WorkerCount; i++ {
-		createWorker(in, out)
+		createWorker(out, c.Scheduler)
 	}
 	// 4 把种子装载进去
 	for _, seed := range seeds {
@@ -45,9 +45,11 @@ func (c *Concurrent) Run(seeds ...Request) {
 	}
 }
 
-func createWorker(in chan Request, out chan ParseResult) {
+func createWorker(out chan ParseResult, s Scheduler) {
+	in := make(chan Request)
 	go func() {
 		for {
+			s.WorkerReady(in)
 			request := <-in
 			result, err := worker(request)
 			if err != nil {

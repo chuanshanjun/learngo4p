@@ -2,11 +2,19 @@ package scheduler
 
 import "chuanshan.github.com/learngo4p/crawler/engine"
 
-type Simple struct {
+type SimpleScheduler struct {
 	WorkChan chan engine.Request
 }
 
-func (s *Simple) Submit(request engine.Request) {
+func (s *SimpleScheduler) Run() {
+	panic("implement me")
+}
+
+func (s *SimpleScheduler) WorkerReady(requests chan engine.Request) {
+	panic("implement me")
+}
+
+func (s *SimpleScheduler) Submit(request engine.Request) {
 	// 15-2 简单调度器12:25讲解，这边为何要用go func
 	// request送给worker送成功的前提是必须要有worker在那等待，
 	// 此时我10个worker都在做其他事情，都不空
@@ -20,6 +28,6 @@ func (s *Simple) Submit(request engine.Request) {
 }
 
 // 配置chan
-func (s *Simple) ConfigureMaterWorkerChan(c chan engine.Request) {
+func (s *SimpleScheduler) ConfigureMaterWorkerChan(c chan engine.Request) {
 	s.WorkChan = c
 }
