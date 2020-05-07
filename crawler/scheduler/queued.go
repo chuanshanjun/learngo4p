@@ -7,6 +7,11 @@ type QueuedScheduler struct {
 	requestChan chan engine.Request
 }
 
+func (q *QueuedScheduler) WorkerChan() chan engine.Request {
+	// 我们希望每个worker有自己的channel
+	return make(chan engine.Request)
+}
+
 func (q *QueuedScheduler) Submit(r engine.Request) {
 	q.requestChan <- r
 }

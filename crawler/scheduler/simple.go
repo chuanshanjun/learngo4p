@@ -3,11 +3,16 @@ package scheduler
 import "chuanshan.github.com/learngo4p/crawler/engine"
 
 type SimpleScheduler struct {
-	WorkChan chan engine.Request
+	workChan chan engine.Request
+}
+
+func (s *SimpleScheduler) WorkerChan() chan engine.Request {
+	return s.workChan
 }
 
 func (s *SimpleScheduler) Run() {
-	panic("implement me")
+	// 在run里面把workerChane做出来
+	s.workChan = make(chan engine.Request)
 }
 
 func (s *SimpleScheduler) WorkerReady(requests chan engine.Request) {
@@ -23,11 +28,11 @@ func (s *SimpleScheduler) Submit(request engine.Request) {
 	// 表示他里面的request要通过scheduler成功的将request送给其他的worker
 	//s.WorkChan <- request
 	go func() {
-		s.WorkChan <- request
+		s.workChan <- request
 	}()
 }
 
 // 配置chan
-func (s *SimpleScheduler) ConfigureMaterWorkerChan(c chan engine.Request) {
-	s.WorkChan = c
-}
+//func (s *SimpleScheduler) ConfigureMaterWorkerChan(c chan engine.Request) {
+//	s.WorkChan = c
+//}
