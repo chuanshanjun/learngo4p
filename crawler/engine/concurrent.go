@@ -1,12 +1,9 @@
 package engine
 
-import (
-	"log"
-)
-
 type Concurrent struct {
 	Scheduler   Scheduler
 	WorkerCount int
+	ItemChan    chan interface{}
 }
 
 type Scheduler interface {
@@ -42,7 +39,10 @@ func (c *Concurrent) Run(seeds ...Request) {
 		parseResult := <-out
 		// 4.1 打印item
 		for _, item := range parseResult.Items {
-			log.Printf("Got item %v\n", item)
+			//log.Printf("Got item %v\n", item)
+			go func() {
+				c.ItemChan <- item
+			}()
 			itemCount++
 		}
 		// 4.2 继续将request放到scheduler
