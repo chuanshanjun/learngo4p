@@ -59,6 +59,18 @@ func (c *Concurrent) Run(seeds ...Request) {
 	}
 }
 
+var visitedUrls = make(map[string]bool)
+
+// 教程的写法
+func isDuplicated(url string) bool {
+	if visitedUrls[url] {
+		return true
+	}
+
+	visitedUrls[url] = true
+	return false
+}
+
 func isDuplicate(url string) bool {
 	_, ok := duplicateUrls[url]
 	if ok {
