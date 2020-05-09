@@ -1,5 +1,7 @@
 package engine
 
+import "chuanshan.github.com/learngo4p/crawler/model"
+
 type Concurrent struct {
 	Scheduler   Scheduler
 	WorkerCount int
@@ -33,17 +35,19 @@ func (c *Concurrent) Run(seeds ...Request) {
 		c.Scheduler.Submit(seed)
 	}
 	// 5 从out中取出值
-	itemCount := 0
+	//itemCount := 0
 	for {
 		// 我要能成功的从out中收到，那么我要将request成功的送走
 		parseResult := <-out
 		// 4.1 打印item
 		for _, item := range parseResult.Items {
 			//log.Printf("Got item %v\n", item)
-			go func() {
-				c.ItemChan <- item
-			}()
-			itemCount++
+			if _, ok := item.(model.Profile); ok {
+				go func() {
+					c.ItemChan <- item
+				}()
+			}
+			//itemCount++
 		}
 		// 4.2 继续将request放到scheduler
 		for _, r := range parseResult.Requests {
