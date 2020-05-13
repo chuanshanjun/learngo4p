@@ -3,7 +3,10 @@ package persist
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"testing"
+
+	"chuanshan.github.com/learngo4p/crawler/engine"
 
 	"gopkg.in/olivere/elastic.v5"
 
@@ -11,18 +14,24 @@ import (
 )
 
 func TestSave(t *testing.T) {
-	expected := model.Profile{
-		Name:      "涵笑",
-		Gender:    "女士",
-		Age:       45,
-		Height:    159,
-		Weight:    52,
-		Income:    "5-8",
-		Marriage:  "离异",
-		Education: "高中及以下",
+	expected := engine.Item{
+		Url:  "http://hanxiao",
+		Type: "zhenai",
+		Id:   "abcDDE",
+		Payload: model.Profile{
+			Name:      "涵笑",
+			Gender:    "女士",
+			Age:       45,
+			Height:    159,
+			Weight:    52,
+			Income:    "5-8",
+			Marriage:  "离异",
+			Education: "高中及以下",
+		},
 	}
 
-	id, err := save(expected)
+	// save expected item
+	err := save(expected)
 	// 测试里面去panic它
 	if err != nil {
 		panic(err)
@@ -36,22 +45,33 @@ func TestSave(t *testing.T) {
 		panic(err)
 	}
 
+	// Fetch saved item
 	resp, err := client.
 		Get().
 		Index("dating_profile").
-		Type("zhenai").
-		Id(id).
+		Type(expected.Type).
+		Id(expected.Id).
 		Do(context.Background())
 
 	t.Logf("resp source %s: ", resp.Source)
 
-	var actual model.Profile
+	var actual engine.Item
 	// type RawMessage []byte 就是一个 byte切片
+	// err不拿也没关系，错了也直接挂掉
 	err = json.Unmarshal(*resp.Source, &actual)
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Printf("actual is %+v", actual)
+
+	actualProfile, err := model.FromJsonObj(actual.Payload)
+	if err != nil {
+		panic(err)
+	}
+	actual.Payload = actualProfile
+
+	// Verify result
 	if actual != expected {
 		t.Errorf("Expected %v, but got %v",
 			expected, actual)

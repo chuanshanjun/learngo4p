@@ -25,7 +25,9 @@ var marriageRe = regexp.MustCompile(`"marriageString":"([^,]+)"`)
 
 var educationRe = regexp.MustCompile(`"educationString":"([^"]+)"`)
 
-func ParseProfile(contents []byte, name string) engine.ParseResult {
+var idUrlRe = regexp.MustCompile(`href="http://album.zhenai.com/u/([0-9].+)">`)
+
+func ParseProfile(contents []byte, url string, name string) engine.ParseResult {
 	profile := model.Profile{}
 
 	profile.Name = name
@@ -49,9 +51,30 @@ func ParseProfile(contents []byte, name string) engine.ParseResult {
 	profile.Marriage = extractString(contents, *marriageRe)
 	profile.Education = extractString(contents, *educationRe)
 
-	return engine.ParseResult{
-		Items: []interface{}{profile},
+	//return engine.ParseResult{
+	//	Items: []interface{}{profile},
+	//}
+
+	result := engine.ParseResult{
+		Requests: []engine.Request{
+			{
+				Url: url,
+				ParserFunc: func(bytes []byte) engine.ParseResult {
+					return ParseProfile(contents, url, name)
+				},
+			},
+		},
+		Items: []engine.Item{
+			{
+				Url:  url,
+				Type: "zhenai",
+				// 可以通过匹配Url
+				Id:      extractString(contents, *idUrlRe),
+				Payload: profile,
+			},
+		},
 	}
+	return result
 }
 
 func extractString(contents []byte, re regexp.Regexp) string {

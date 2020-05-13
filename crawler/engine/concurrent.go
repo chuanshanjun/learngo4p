@@ -5,7 +5,7 @@ import "chuanshan.github.com/learngo4p/crawler/model"
 type Concurrent struct {
 	Scheduler   Scheduler
 	WorkerCount int
-	ItemChan    chan interface{}
+	ItemChan    chan Item
 }
 
 type Scheduler interface {
@@ -42,7 +42,7 @@ func (c *Concurrent) Run(seeds ...Request) {
 		// 4.1 打印item
 		for _, item := range parseResult.Items {
 			//log.Printf("Got item %v\n", item)
-			if _, ok := item.(model.Profile); ok {
+			if _, ok := item.Payload.(model.Profile); ok {
 				go func() {
 					c.ItemChan <- item
 				}()
