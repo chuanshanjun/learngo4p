@@ -59,9 +59,11 @@ func ParseProfile(contents []byte, url string, name string) engine.ParseResult {
 		Requests: []engine.Request{
 			{
 				Url: url,
-				ParserFunc: func(bytes []byte) engine.ParseResult {
-					return ParseProfile(contents, url, name)
-				},
+				//ParserFunc: func(bytes []byte) engine.ParseResult {
+				//	return ParseProfile(contents, url, name)
+				//},
+				// 此处把上面给包装了下
+				ParserFunc: ProfileParser(name),
 			},
 		},
 		Items: []engine.Item{
@@ -83,5 +85,11 @@ func extractString(contents []byte, re regexp.Regexp) string {
 		return string(matches[1])
 	} else {
 		return ""
+	}
+}
+
+func ProfileParser(name string) engine.ParserFunc {
+	return func(c []byte, url string) engine.ParseResult {
+		return ParseProfile(c, url, name)
 	}
 }

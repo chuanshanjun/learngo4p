@@ -22,7 +22,7 @@ func TestParseCityList(t *testing.T) {
 	//	"City: 北京", "City: 上海", "City: 天津",
 	//}
 
-	result := ParseCityList(contents)
+	result := ParseCityList(contents, "")
 	const urlSize = 481
 	if len(result.Requests) != urlSize {
 		log.Printf("Expect get url size %d, but got %d", urlSize, len(result.Requests))

@@ -3,8 +3,6 @@ package engine
 import (
 	"fmt"
 	"log"
-
-	"chuanshan.github.com/learngo4p/crawler/fetcher"
 )
 
 type SimpleEngine struct {
@@ -32,15 +30,4 @@ func (s *SimpleEngine) Run(seeds ...Request) {
 			fmt.Printf("Got item %v\n", item)
 		}
 	}
-}
-
-func worker(r Request) (ParseResult, error) {
-	log.Printf("Fetch ulr %v", r.Url)
-	body, err := fetcher.Fetch(r.Url)
-	if err != nil {
-		log.Printf("Fetcher: error fetching url %s: %v", r.Url, err)
-		return ParseResult{}, err
-	}
-
-	return r.ParserFunc(body), nil
 }

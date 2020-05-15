@@ -8,11 +8,16 @@ import (
 )
 
 func main() {
+	itemChan, err := persist.ItemSaver("dating_profile")
+	if err != nil {
+		panic(err)
+	}
+
 	e := engine.Concurrent{
 		// 用指针...
-		WorkerCount: 10,
+		WorkerCount: 100,
 		Scheduler:   &scheduler.QueuedScheduler{},
-		ItemChan:    persist.ItemSaver(),
+		ItemChan:    itemChan,
 	}
 	e.Run(engine.Request{
 		Url:        "http://m.zhenai.com/zhenghun",

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"regexp"
 
 	"chuanshan.github.com/learngo4p/crawler/engine"
@@ -9,7 +8,7 @@ import (
 
 const cityListRe = `<a href="(http://m.zhenai.com/zhenghun/[0-9a-z]+)" [^>]*>([^<]+)</a>`
 
-func ParseCityList(contents []byte) engine.ParseResult {
+func ParseCityList(contents []byte, _ string) engine.ParseResult {
 	re := regexp.MustCompile(cityListRe)
 	matches := re.FindAllSubmatch(contents, -1)
 
@@ -21,7 +20,7 @@ func ParseCityList(contents []byte) engine.ParseResult {
 			Url:        string(m[1]),
 			ParserFunc: ParseCity,
 		})
-		fmt.Printf("City: %s, URL: %s\n", m[2], m[1])
+		//fmt.Printf("City: %s, URL: %s\n", m[2], m[1])
 		cityCounts++
 		if cityCounts == 10 {
 			break

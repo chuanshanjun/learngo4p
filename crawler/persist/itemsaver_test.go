@@ -30,13 +30,6 @@ func TestSave(t *testing.T) {
 		},
 	}
 
-	// save expected item
-	err := save(expected)
-	// 测试里面去panic它
-	if err != nil {
-		panic(err)
-	}
-
 	// TODO 目前ES依赖外部环境，但在测试中不希望出现此情况
 	// Try to start up es here using docker go client.
 	client, err := elastic.NewClient(
@@ -45,10 +38,18 @@ func TestSave(t *testing.T) {
 		panic(err)
 	}
 
+	const index = "dating_test"
+	// save expected item
+	err = save(client, expected, index)
+	// 测试里面去panic它
+	if err != nil {
+		panic(err)
+	}
+
 	// Fetch saved item
 	resp, err := client.
 		Get().
-		Index("dating_profile").
+		Index(index).
 		Type(expected.Type).
 		Id(expected.Id).
 		Do(context.Background())

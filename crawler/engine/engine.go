@@ -25,7 +25,7 @@ func Run(seeds ...Request) {
 			continue
 		}
 
-		parseResult := r.ParserFunc(body)
+		parseResult := r.ParserFunc(body, "")
 
 		requests = append(requests, parseResult.Requests...)
 
