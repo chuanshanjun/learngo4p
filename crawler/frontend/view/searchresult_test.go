@@ -1,7 +1,6 @@
-package frontend
+package view
 
 import (
-	"html/template"
 	"os"
 	"testing"
 
@@ -12,10 +11,12 @@ import (
 	common "chuanshan.github.com/learngo4p/crawler/model"
 )
 
-func TestTemplate(t *testing.T) {
+func TestSearchResultView_Render(t *testing.T) {
 	// must我们认为模版语法没错误
-	template := template.Must(
-		template.ParseFiles("template.html"))
+	//template := template.Must(
+	//	template.ParseFiles("template.html"))
+
+	view := CreateSearchResultView("template.html")
 
 	out, err := os.Create("template.test.html")
 
@@ -45,7 +46,7 @@ func TestTemplate(t *testing.T) {
 	// os.Stdout 往屏幕输出
 	//err := template.Execute(os.Stdout, page)
 	// 不往屏幕输出往template.test.html输出
-	err = template.Execute(out, page)
+	err = view.Render(out, page)
 	if err != nil {
 		panic(err)
 	}
