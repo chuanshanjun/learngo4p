@@ -17,8 +17,10 @@ func ParseCityList(contents []byte, _ string) engine.ParseResult {
 	for _, m := range matches {
 		//result.Items = append(result.Items, "City: "+string(m[2]))
 		result.Requests = append(result.Requests, engine.Request{
-			Url:        string(m[1]),
-			ParserFunc: ParseCity,
+			Url: string(m[1]),
+			// 函数parseCity写完后，我们用函数NewFuncParser包装下
+			// 反序列化，最终我们最终在网络上传输的是不是ParseCity函数，而是ParseCity字符串
+			Parser: engine.NewFuncParser(ParseCity, "ParseCity"),
 		})
 		//fmt.Printf("City: %s, URL: %s\n", m[2], m[1])
 		cityCounts++

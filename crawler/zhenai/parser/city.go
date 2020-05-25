@@ -28,7 +28,7 @@ func ParseCity(contents []byte, _ string) engine.ParseResult {
 			//ParserFunc: func(c []byte) engine.ParseResult {
 			//	return ParseProfile(c, url, name)
 			//},
-			ParserFunc: ProfileParser(string(m[2])),
+			Parser: NewProfileParser(string(m[2])),
 		})
 		//fmt.Printf("User: %s, URL: %s\n", m[2], m[1])
 	}
@@ -36,8 +36,8 @@ func ParseCity(contents []byte, _ string) engine.ParseResult {
 	matches = cityUrlRe.FindAllSubmatch(contents, -1)
 	for _, m := range matches {
 		result.Requests = append(result.Requests, engine.Request{
-			Url:        string(m[1]),
-			ParserFunc: ParseCity,
+			Url:    string(m[1]),
+			Parser: engine.NewFuncParser(ParseCity, "ParseCity"),
 		})
 	}
 	return result

@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 
+	"chuanshan.github.com/learngo4p/crawler/zhenai/parser"
+
 	"chuanshan.github.com/learngo4p/crawler/engine"
-	"chuanshan.github.com/learngo4p/crawler/parser"
 	"chuanshan.github.com/learngo4p/crawler/scheduler"
 	"chuanshan.github.com/learngo4p/crawler_distributed/config"
 	"chuanshan.github.com/learngo4p/crawler_distributed/persist/client"
@@ -24,8 +25,8 @@ func main() {
 		ItemChan:    itemChan,
 	}
 	e.Run(engine.Request{
-		Url:        "http://m.zhenai.com/zhenghun",
-		ParserFunc: parser.ParseCityList,
+		Url:    "http://m.zhenai.com/zhenghun",
+		Parser: engine.NewFuncParser(parser.ParseCityList, "ParseCityList"),
 	})
 
 	//e := engine.SimpleEngine{}
