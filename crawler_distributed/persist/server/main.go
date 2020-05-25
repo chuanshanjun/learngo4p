@@ -1,13 +1,16 @@
 package main
 
 import (
+	"fmt"
+
+	"chuanshan.github.com/learngo4p/crawler_distributed/config"
 	"chuanshan.github.com/learngo4p/crawler_distributed/persist"
 	"chuanshan.github.com/learngo4p/crawler_distributed/rpcsupport"
 	"gopkg.in/olivere/elastic.v5"
 )
 
 func main() {
-	err := serveRpc(":1234", "dating_profile")
+	err := serveRpc(fmt.Sprintf(":%d", config.ItemSaverPort), config.ElasticIndex)
 	if err != nil {
 		panic(err)
 	}
