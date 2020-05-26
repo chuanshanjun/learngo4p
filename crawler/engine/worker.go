@@ -6,7 +6,7 @@ import (
 	"chuanshan.github.com/learngo4p/crawler/fetcher"
 )
 
-func worker(r Request) (ParseResult, error) {
+func Worker(r Request) (ParseResult, error) {
 	//log.Printf("Fetch ulr %v", r.Url)
 	body, err := fetcher.Fetch(r.Url)
 	if err != nil {
