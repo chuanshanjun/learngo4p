@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"strconv"
 
+	"chuanshan.github.com/learngo4p/crawler_distributed/config"
+
 	"chuanshan.github.com/learngo4p/crawler/engine"
 
 	"chuanshan.github.com/learngo4p/crawler/model"
@@ -110,7 +112,8 @@ func (p *ProfileParser) Parse(contents []byte, url string) engine.ParseResult {
 // 然后再加上Serialize,就是可以序列化/反序列化了
 func (p *ProfileParser) Serialize() (name string, args interface{}) {
 	// 对方用ProfileParser来解析的时候，如果需要name的时候，再把第二个参数p.userName传送过去
-	return "ProfileParser", p.userName
+	//return "ProfileParser", p.userName
+	return config.ParseProfile, p.userName
 }
 
 // 帮助函数，存一个name，然后生成一个函数

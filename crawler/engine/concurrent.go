@@ -1,12 +1,14 @@
 package engine
 
-import "chuanshan.github.com/learngo4p/crawler/model"
-
 type Concurrent struct {
-	Scheduler   Scheduler
-	WorkerCount int
-	ItemChan    chan Item
+	Scheduler        Scheduler
+	WorkerCount      int
+	ItemChan         chan Item
+	RequestProcessor Processor
 }
+
+// 函数也可以定义为一种类型
+type Processor func(Request) (ParseResult, error)
 
 type Scheduler interface {
 	Submit(Request)
@@ -22,17 +24,17 @@ type ReadyNotifier interface {
 
 var duplicateUrls = make(map[string]bool)
 
-func (c *Concurrent) Run(seeds ...Request) {
+func (e *Concurrent) Run(seeds ...Request) {
 	// 1 创建channel of out
 	out := make(chan ParseResult)
-	c.Scheduler.Run()
+	e.Scheduler.Run()
 	// 2 createWorker
-	for i := 0; i < c.WorkerCount; i++ {
-		createWorker(c.Scheduler.WorkerChan(), out, c.Scheduler)
+	for i := 0; i < e.WorkerCount; i++ {
+		e.createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 	// 4 把种子装载进去
 	for _, seed := range seeds {
-		c.Scheduler.Submit(seed)
+		e.Scheduler.Submit(seed)
 	}
 	// 5 从out中取出值
 	//itemCount := 0
@@ -42,11 +44,18 @@ func (c *Concurrent) Run(seeds ...Request) {
 		// 4.1 打印item
 		for _, item := range parseResult.Items {
 			//log.Printf("Got item %v\n", item)
-			if _, ok := item.Payload.(model.Profile); ok {
+
+			if item.Payload != nil {
 				go func() {
-					c.ItemChan <- item
+					e.ItemChan <- item
 				}()
 			}
+
+			//if _, ok := item.Payload.(model.Profile); ok {
+			//	go func() {
+			//		e.ItemChan <- item
+			//	}()
+			//}
 			//itemCount++
 		}
 		// 4.2 继续将request放到scheduler
@@ -54,7 +63,7 @@ func (c *Concurrent) Run(seeds ...Request) {
 			if isDuplicate(r.Url) {
 				continue
 			}
-			c.Scheduler.Submit(r)
+			e.Scheduler.Submit(r)
 		}
 	}
 }
@@ -82,12 +91,14 @@ func isDuplicate(url string) bool {
 	}
 }
 
-func createWorker(in chan Request, out chan ParseResult, read ReadyNotifier) {
+func (e *Concurrent) createWorker(in chan Request, out chan ParseResult, read ReadyNotifier) {
 	go func() {
 		for {
 			read.WorkerReady(in)
 			request := <-in
-			result, err := Worker(request)
+			// 此处的Worker将其拆成RPC请求
+			//result, err := Worker(request)
+			result, err := e.RequestProcessor(request)
 			if err != nil {
 				continue
 			}
